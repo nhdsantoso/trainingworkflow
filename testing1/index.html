@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spin The Wheel – Telkomsel</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(160deg, #E4002B 0%, #8B0015 60%, #3D0009 100%);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    /* ── Header ── */
+    header {
+      width: 100%;
+      padding: 18px 24px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(0,0,0,0.18);
+    }
+
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 52px;
+      height: 52px;
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1;
+    }
+
+    .logo-text span:first-child {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+
+    .logo-text span:last-child {
+      font-size: 11px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.75);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .tagline {
+      margin-top: 8px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.65);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* ── Main Container ── */
+    main {
+      width: 100%;
+      max-width: 480px;
+      padding: 24px 20px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+    }
+
+    /* ── Phone Input Card ── */
+    #input-screen {
+      width: 100%;
+      background: rgba(255,255,255,0.97);
+      border-radius: 20px;
+      padding: 28px 24px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.35);
+    }
+
+    #input-screen h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #E4002B;
+      margin-bottom: 6px;
+    }
+
+    #input-screen p {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      border: 2px solid #E4002B;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+
+    .input-group:focus-within {
+      box-shadow: 0 0 0 3px rgba(228,0,43,0.18);
+    }
+
+    .input-prefix {
+      background: #E4002B;
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 13px 14px;
+      white-space: nowrap;
+    }
+
+    #phone-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      padding: 13px 14px;
+      color: #222;
+      letter-spacing: 1px;
+    }
+
+    #phone-input::placeholder { color: #bbb; letter-spacing: 0.5px; }
+
+    #start-btn {
+      margin-top: 18px;
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #E4002B, #A8001F);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 16px rgba(228,0,43,0.4);
+    }
+
+    #start-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(228,0,43,0.5); }
+    #start-btn:active { transform: translateY(0); }
+
+    .error-msg {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #E4002B;
+      display: none;
+    }
+
+    /* ── Game Screen ── */
+    #game-screen { display: none; width: 100%; flex-direction: column; align-items: center; gap: 20px; }
+
+    .player-badge {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      backdrop-filter: blur(6px);
+      border-radius: 50px;
+      padding: 8px 20px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .player-badge span { color: rgba(255,255,255,0.75); font-weight: 400; }
+
+    /* ── Wheel Wrapper ── */
+    .wheel-wrapper {
+      position: relative;
+      width: 320px;
+      height: 320px;
+    }
+
+    #wheel-canvas {
+      border-radius: 50%;
+      box-shadow: 0 0 0 6px rgba(255,255,255,0.25), 0 12px 50px rgba(0,0,0,0.5);
+      display: block;
+    }
+
+    /* Pointer / Arrow */
+    .pointer {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 16px solid transparent;
+      border-right: 16px solid transparent;
+      border-top: 36px solid #FFD700;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+      z-index: 10;
+    }
+
+    /* Center Hub */
+    .hub {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff 40%, #ddd 100%);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.35);
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hub-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #E4002B;
+    }
+
+    /* ── Spin Button ── */
+    #spin-btn {
+      padding: 15px 52px;
+      background: linear-gradient(135deg, #FFD700, #FFA500);
+      color: #3D0009;
+      font-size: 17px;
+      font-weight: 800;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      box-shadow: 0 6px 24px rgba(255,165,0,0.5);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    #spin-btn:hover:not(:disabled) { transform: translateY(-3px) scale(1.03); box-shadow: 0 10px 30px rgba(255,165,0,0.55); }
+    #spin-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    /* ── Prize Legend ── */
+    .legend {
+      width: 100%;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      backdrop-filter: blur(8px);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .legend h3 {
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 12px;
+      opacity: 0.8;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .legend-item:last-child { border-bottom: none; }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .legend-label {
+      flex: 1;
+      font-size: 13px;
+      color: rgba(255,255,255,0.9);
+      font-weight: 500;
+    }
+
+    .legend-chance {
+      font-size: 12px;
+      color: rgba(255,255,255,0.55);
+      font-weight: 600;
+    }
+
+    /* ── Result Modal ── */
+    #result-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    #result-modal.show { display: flex; }
+
+    .modal-card {
+      background: #fff;
+      border-radius: 24px;
+      padding: 36px 28px 28px;
+      max-width: 340px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+      animation: popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.6); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+
+    .confetti-emoji { font-size: 48px; display: block; margin-bottom: 10px; }
+
+    .modal-card h2 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+    }
+
+    .prize-name {
+      font-size: 22px;
+      font-weight: 800;
+      color: #E4002B;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .prize-sub {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 24px;
+    }
+
+    .modal-phone {
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 22px;
+    }
+
+    .modal-phone strong { color: #E4002B; }
+
+    .modal-actions { display: flex; gap: 10px; }
+
+    .btn-claim {
+      flex: 1;
+      padding: 14px;
+      background: linear-gradient(135deg, #E4002B, #A8001F);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(228,0,43,0.35);
+    }
+
+    .btn-again {
+      flex: 1;
+      padding: 14px;
+      background: #f5f5f5;
+      color: #555;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .btn-again:hover { background: #eee; }
+
+    /* ── Responsive ── */
+    @media (max-width: 360px) {
+      .wheel-wrapper { width: 280px; height: 280px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-wrap">
+    <!-- Telkomsel Logo SVG -->
+    <svg class="logo-icon" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="26" cy="26" r="26" fill="#fff"/>
+      <!-- Stylized T mark in Telkomsel red -->
+      <path d="M10 16 h32 v5 H30 v15 H22 V21 H10 z" fill="#E4002B"/>
+      <path d="M18 30 Q26 42 34 30" stroke="#E4002B" stroke-width="3" fill="none" stroke-linecap="round"/>
+    </svg>
+    <div class="logo-text">
+      <span>telkomsel</span>
+      <span>The Real Network</span>
+    </div>
+  </div>
+  <div class="tagline">Lucky Spin Hadiah</div>
+</header>
+
+<main>
+
+  <!-- ── Phone Input ── -->
+  <div id="input-screen">
+    <h2>Masukkan Nomor Kamu</h2>
+    <p>Putar roda keberuntungan & menangkan hadiah menarik dari Telkomsel!</p>
+    <div class="input-group">
+      <div class="input-prefix">+62</div>
+      <input
+        id="phone-input"
+        type="tel"
+        inputmode="numeric"
+        maxlength="13"
+        placeholder="8xx xxxx xxxx"
+        oninput="this.value=this.value.replace(/[^0-9]/,'')"
+      />
+    </div>
+    <p class="error-msg" id="error-msg">Masukkan nomor Telkomsel yang valid (10–13 digit).</p>
+    <button id="start-btn" onclick="startGame()">Mulai Putar ✦</button>
+  </div>
+
+  <!-- ── Game Screen ── -->
+  <div id="game-screen">
+    <div class="player-badge" id="player-badge">
+      <span>Nomor: </span><strong id="display-phone">–</strong>
+    </div>
+
+    <div class="wheel-wrapper">
+      <div class="pointer"></div>
+      <canvas id="wheel-canvas" width="320" height="320"></canvas>
+      <div class="hub"><div class="hub-dot"></div></div>
+    </div>
+
+    <button id="spin-btn" onclick="spin()">🎰 PUTAR SEKARANG!</button>
+
+    <!-- Legend -->
+    <div class="legend">
+      <h3>Daftar Hadiah</h3>
+      <div id="legend-list"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── Result Modal ── -->
+<div id="result-modal">
+  <div class="modal-card">
+    <span class="confetti-emoji" id="modal-emoji">🎉</span>
+    <h2>Selamat! Kamu Menang</h2>
+    <div class="prize-name" id="modal-prize">–</div>
+    <div class="prize-sub" id="modal-sub">–</div>
+    <div class="modal-phone">Hadiah dikirim ke nomor <strong id="modal-phone">–</strong></div>
+    <div class="modal-actions">
+      <button class="btn-claim" onclick="closeModal()">Klaim Hadiah</button>
+      <button class="btn-again" onclick="playAgain()">Putar Lagi</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Prize Data ──────────────────────────────────────────────
+  const PRIZES = [
+    { label: 'Bonus Kuota\n1 GB',       sub: 'Kuota Internet 1 GB',                   emoji: '📶', color: '#E4002B', light: '#FF3355', chance: 20 },
+    { label: 'MAXstream\nKuota 5 GB',   sub: 'Kuota MAXstream 5 GB',                  emoji: '🎬', color: '#B0001F', light: '#D9002C', chance: 40 },
+    { label: 'TelkomselPoin',           sub: 'Poin Reward Telkomsel',                 emoji: '⭐', color: '#8B0015', light: '#B0001F', chance: 20 },
+    { label: 'Bonus Kuota\n5 GB',       sub: 'Kuota Internet 5 GB',                   emoji: '🚀', color: '#C0001F', light: '#E4002B', chance: 10 },
+    { label: 'Free Voice\n100 Mnt/Hari',sub: 'Gratis Telepon Off-Net 100 Menit/Hari', emoji: '📞', color: '#6B0010', light: '#960018', chance: 10 },
+  ];
+
+  // Build weighted index array based on chance
+  const WEIGHTED = [];
+  PRIZES.forEach((p, i) => { for (let j = 0; j < p.chance; j++) WEIGHTED.push(i); });
+
+  // ── Canvas Setup ──────────────────────────────────────────
+  const canvas  = document.getElementById('wheel-canvas');
+  const ctx     = canvas.getContext('2d');
+  const N       = PRIZES.length;
+  const ARC     = (2 * Math.PI) / N;
+  let   rotation = 0;
+  let   spinning  = false;
+
+  function drawWheel(rot) {
+    const cx = canvas.width / 2, cy = canvas.height / 2, r = cx - 4;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    PRIZES.forEach((prize, i) => {
+      const start = rot + i * ARC - Math.PI / 2;
+      const end   = start + ARC;
+      const mid   = start + ARC / 2;
+
+      // Segment
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, r, start, end);
+      ctx.closePath();
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      grad.addColorStop(0, prize.light);
+      grad.addColorStop(1, prize.color);
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Divider
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, r, start, end);
+      ctx.closePath();
+      ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Emoji
+      ctx.save();
+      ctx.translate(cx + (r * 0.6) * Math.cos(mid), cy + (r * 0.6) * Math.sin(mid));
+      ctx.rotate(mid + Math.PI / 2);
+      ctx.font = '20px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(prize.emoji, 0, -22);
+      ctx.restore();
+
+      // Label (multi-line)
+      ctx.save();
+      ctx.translate(cx + (r * 0.6) * Math.cos(mid), cy + (r * 0.6) * Math.sin(mid));
+      ctx.rotate(mid + Math.PI / 2);
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 11px Segoe UI, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.shadowColor = 'rgba(0,0,0,0.4)';
+      ctx.shadowBlur = 3;
+      const lines = prize.label.split('\n');
+      lines.forEach((line, li) => ctx.fillText(line, 0, li * 14));
+      ctx.restore();
+    });
+
+    // Outer ring
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    ctx.lineWidth = 5;
+    ctx.stroke();
+  }
+
+  drawWheel(rotation);
+
+  // ── Legend ────────────────────────────────────────────────
+  const legendList = document.getElementById('legend-list');
+  PRIZES.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'legend-item';
+    div.innerHTML = `
+      <div class="legend-dot" style="background:${p.light}"></div>
+      <div class="legend-label">${p.label.replace('\n', ' ')}</div>
+      <div class="legend-chance">${p.chance}%</div>
+    `;
+    legendList.appendChild(div);
+  });
+
+  // ── Spin Logic ───────────────────────────────────────────
+  let winIndex = 0;
+
+  function pickWinner() {
+    const r = Math.floor(Math.random() * 100);
+    let cum = 0;
+    for (let i = 0; i < PRIZES.length; i++) {
+      cum += PRIZES[i].chance;
+      if (r < cum) return i;
+    }
+    return PRIZES.length - 1;
+  }
+
+  function spin() {
+    if (spinning) return;
+    spinning = true;
+    document.getElementById('spin-btn').disabled = true;
+
+    winIndex = pickWinner();
+
+    // Calculate target rotation: winner segment should land under the top pointer (12 o'clock)
+    // The pointer is at angle -PI/2 (top). Segment i starts at rotation + i*ARC - PI/2
+    // We want the midpoint of segment winIndex to be at -PI/2
+    // midpoint angle of segment winIndex = rot + winIndex*ARC + ARC/2 - PI/2 = -PI/2
+    // So target rotation where midpoint is at top: -winIndex*ARC - ARC/2
+    const targetSegmentAngle = -(winIndex * ARC + ARC / 2);
+    const extraSpins = (5 + Math.floor(Math.random() * 4)) * 2 * Math.PI;
+    // Normalize current rotation
+    const currentNorm = rotation % (2 * Math.PI);
+    let delta = (targetSegmentAngle - currentNorm + 4 * Math.PI) % (2 * Math.PI);
+    if (delta < 0.1) delta += 2 * Math.PI;
+    const totalDelta = extraSpins + delta;
+
+    const duration = 4500 + Math.random() * 1000;
+    const startTime = performance.now();
+    const startRot  = rotation;
+
+    function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
+
+    function animate(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      rotation = startRot + totalDelta * easeOut(progress);
+      drawWheel(rotation);
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        rotation = startRot + totalDelta;
+        drawWheel(rotation);
+        spinning = false;
+        setTimeout(showResult, 350);
+      }
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  // ── Phone Validation & Game Flow ─────────────────────────
+  let playerPhone = '';
+
+  function startGame() {
+    const raw = document.getElementById('phone-input').value.trim();
+    const err = document.getElementById('error-msg');
+    // Accept format starting with 08 or 8, length 10-13 digits
+    const clean = raw.replace(/^0/, '');
+    if (!/^8[0-9]{8,11}$/.test(clean)) {
+      err.style.display = 'block';
+      return;
+    }
+    err.style.display = 'none';
+    playerPhone = '0' + clean;
+    document.getElementById('display-phone').textContent = playerPhone;
+    document.getElementById('input-screen').style.display = 'none';
+    const gs = document.getElementById('game-screen');
+    gs.style.display = 'flex';
+    drawWheel(rotation);
+  }
+
+  function showResult() {
+    const prize = PRIZES[winIndex];
+    document.getElementById('modal-emoji').textContent  = prize.emoji;
+    document.getElementById('modal-prize').textContent  = prize.label.replace('\n', ' ');
+    document.getElementById('modal-sub').textContent    = prize.sub;
+    document.getElementById('modal-phone').textContent  = playerPhone;
+    document.getElementById('result-modal').classList.add('show');
+  }
+
+  function closeModal() {
+    document.getElementById('result-modal').classList.remove('show');
+    // Reset spin button but don't allow another spin (one per session)
+    document.getElementById('spin-btn').textContent  = '✅ Hadiah Diklaim!';
+    document.getElementById('spin-btn').disabled     = true;
+  }
+
+  function playAgain() {
+    document.getElementById('result-modal').classList.remove('show');
+    document.getElementById('spin-btn').disabled    = false;
+    document.getElementById('spin-btn').textContent = '🎰 PUTAR SEKARANG!';
+  }
+
+  // Allow Enter key on phone input
+  document.getElementById('phone-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') startGame();
+  });
+</script>
+</body>
+</html>
