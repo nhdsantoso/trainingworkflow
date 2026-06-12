@@ -4,7 +4,7 @@ then parses pricing/quota data into structured dicts.
 """
 
 import os, re, json
-from firecrawl import FirecrawlApp
+from firecrawl import V1FirecrawlApp as FirecrawlApp
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -45,13 +45,11 @@ def _crawl(app: FirecrawlApp, url: str) -> str:
     try:
         result = app.scrape_url(
             url,
-            params={
-                "formats": ["markdown"],
-                "waitFor": 2000,
-                "timeout": 30000,
-            },
+            formats=["markdown"],
+            wait_for=2000,
+            timeout=30000,
         )
-        return result.get("markdown", "") or ""
+        return result.markdown or ""
     except Exception as e:
         print(f"  [WARN] Failed to scrape {url}: {e}")
         return ""
