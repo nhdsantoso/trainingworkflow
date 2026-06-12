@@ -1,0 +1,83 @@
+{
+  "xl_kartu_perdana": [
+    {
+      "brand": "XL",
+      "category": "Kartu Perdana",
+      "name": "Personal**",
+      "price": 45,
+      "quota": "–",
+      "validity": "–",
+      "bucket": "under_30k"
+    }
+  ],
+  "xl_broadband": [
+    {
+      "brand": "XL",
+      "category": "Broadband",
+      "name": "Personal**",
+      "price": 45,
+      "quota": "–",
+      "validity": "–",
+      "bucket": "under_30k"
+    },
+    {
+      "brand": "XL",
+      "category": "Broadband",
+      "name": "HKM M21",
+      "price": 559000,
+      "quota": "–",
+      "validity": "–",
+      "bucket": null
+    },
+    {
+      "brand": "XL",
+      "category": "Broadband",
+      "name": "HKM M22",
+      "price": 618997,
+      "quota": "–",
+      "validity": "–",
+      "bucket": null
+    },
+    {
+      "brand": "XL",
+      "category": "Broadband",
+      "name": "Isi Pulsa Langsung Jadi Kuota",
+      "price": 5000,
+      "quota": "1 GB",
+      "validity": "–",
+      "bucket": "under_30k"
+    },
+    {
+      "brand": "XL",
+      "category": "Broadband",
+      "name": "",
+      "price": 25000,
+      "quota": "–",
+      "validity": "–",
+      "bucket": "under_30k"
+    }
+  ],
+  "xl_addon": [
+    {
+      "brand": "XL",
+      "category": "Add-On",
+      "name": "Personal**",
+      "price": 45,
+      "quota": "–",
+      "validity": "–",
+      "bucket": "under_30k"
+    }
+  ],
+  "simpati": [],
+  "byu": [
+    {
+      "brand": "Telkomsel",
+      "category": "byU",
+      "name": "Kuota Favorit Anak by.U",
+      "price": 15000,
+      "quota": "7 GB",
+      "validity": "14 Hari",
+      "bucket": "under_30k"
+    }
+  ]
+}
