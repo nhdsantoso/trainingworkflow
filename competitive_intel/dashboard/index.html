@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Competitive Intelligence — Telkomsel KTI</title>
+<style>
+/* ── Tokens ─────────────────────────────────────────────── */
+:root {
+  --bg:          #F0F2F7;
+  --surface:     #FFFFFF;
+  --surface2:    #E8EBF3;
+  --border:      #D1D5E0;
+  --text:        #111827;
+  --text-muted:  #5A6272;
+  --text-faint:  #9AA1B0;
+
+  --tsel:        #E10026;
+  --tsel-light:  #FFF0F2;
+  --tsel-mid:    #FFDDE2;
+  --comp:        #2563EB;
+  --comp-light:  #EEF4FF;
+  --comp-mid:    #DBEAFE;
+
+  --pos:         #16A34A;
+  --pos-light:   #DCFCE7;
+  --neg:         #DC2626;
+  --neg-light:   #FEE2E2;
+  --neu:         #D97706;
+  --neu-light:   #FEF3C7;
+
+  --radius:      8px;
+  --radius-sm:   5px;
+  --shadow:      0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:   0 4px 12px rgba(0,0,0,.10);
+
+  --font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:         #0D1117;
+    --surface:    #161B27;
+    --surface2:   #1E2535;
+    --border:     #2A3045;
+    --text:       #E8EAF0;
+    --text-muted: #8B93A8;
+    --text-faint: #4A5270;
+    --tsel-light: #2A0A10;
+    --tsel-mid:   #3D0F18;
+    --comp-light: #0D1E3D;
+    --comp-mid:   #132B55;
+    --pos-light:  #052E16;
+    --neg-light:  #2D0A0A;
+    --neu-light:  #2D1A00;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg:         #0D1117;
+  --surface:    #161B27;
+  --surface2:   #1E2535;
+  --border:     #2A3045;
+  --text:       #E8EAF0;
+  --text-muted: #8B93A8;
+  --text-faint: #4A5270;
+  --tsel-light: #2A0A10;
+  --tsel-mid:   #3D0F18;
+  --comp-light: #0D1E3D;
+  --comp-mid:   #132B55;
+  --pos-light:  #052E16;
+  --neg-light:  #2D0A0A;
+  --neu-light:  #2D1A00;
+}
+
+/* ── Reset ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+a { color: var(--comp); text-decoration: none; }
+button { cursor: pointer; font-family: inherit; border: none; background: none; }
+svg { display: block; }
+
+/* ── Top Bar ────────────────────────────────────────────── */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.topbar-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.topbar-row1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--tsel);
+  flex-shrink: 0;
+}
+.brand-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -.015em;
+}
+.brand-sub {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.topbar-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.last-updated {
+  font-size: 11px;
+  color: var(--text-faint);
+  letter-spacing: .03em;
+}
+.theme-toggle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  transition: background .15s;
+}
+.theme-toggle:hover { background: var(--border); }
+
+.topbar-row2 {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding-bottom: 0;
+  flex-wrap: wrap;
+}
+.filter-section {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0;
+  border-right: 1px solid var(--border);
+  padding-right: 16px;
+  margin-right: 16px;
+}
+.filter-section:last-child {
+  border-right: none;
+  padding-right: 0;
+  margin-right: 0;
+}
+.filter-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text-faint);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Toggle buttons */
+.toggle-group { display: flex; gap: 4px; }
+.toggle-btn {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  transition: all .15s;
+  white-space: nowrap;
+}
+.toggle-btn:hover { background: var(--surface2); color: var(--text); }
+.toggle-btn.active-mobile {
+  background: var(--comp);
+  border-color: var(--comp);
+  color: #fff;
+}
+.toggle-btn.active-fixed {
+  background: var(--tsel);
+  border-color: var(--tsel);
+  color: #fff;
+}
+
+/* Region chips */
+.region-chips { display: flex; gap: 4px; flex-wrap: wrap; }
+.chip {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  transition: all .15s;
+  cursor: pointer;
+}
+.chip:hover { color: var(--text); border-color: var(--text-muted); }
+.chip.active {
+  background: var(--comp-mid);
+  border-color: var(--comp);
+  color: var(--comp);
+}
+
+/* Category tabs */
+.cat-tabs { display: flex; gap: 0; }
+.cat-tab {
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+  transition: all .15s;
+  white-space: nowrap;
+  letter-spacing: .01em;
+}
+.cat-tab:hover { color: var(--text); }
+.cat-tab.active { color: var(--comp); border-bottom-color: var(--comp); }
+
+/* ── Page layout ────────────────────────────────────────── */
+.page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 24px 64px;
+}
+
+/* ── Summary strip ──────────────────────────────────────── */
+.summary-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: var(--shadow);
+}
+.stat-card .label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text-faint);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.stat-card .value {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+.stat-card .sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+.stat-card.tsel .value { color: var(--tsel); }
+.stat-card.comp .value { color: var(--comp); }
+
+/* ── Section heading ────────────────────────────────────── */
+.section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 12px;
+  margin-top: 28px;
+}
+.section-head:first-of-type { margin-top: 0; }
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: var(--text);
+}
+.section-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.section-badge {
+  margin-left: auto;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.badge-comp { background: var(--comp-light); color: var(--comp); }
+.badge-tsel { background: var(--tsel-light); color: var(--tsel); }
+
+/* ── Comparison table ───────────────────────────────────── */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  background: var(--surface);
+  margin-bottom: 24px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+thead th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  font-weight: 700;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  background: var(--surface2);
+}
+thead th.tsel-col { background: var(--tsel-light); color: var(--tsel); }
+thead th.comp-col { background: var(--comp-light); color: var(--comp); }
+tbody tr { border-bottom: 1px solid var(--border); }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--surface2); }
+td {
+  padding: 9px 14px;
+  vertical-align: middle;
+  color: var(--text);
+}
+td.muted { color: var(--text-muted); font-size: 11.5px; }
+td.price { font-weight: 600; }
+.brand-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.brand-chip.tsel { background: var(--tsel-mid); color: var(--tsel); }
+.brand-chip.comp { background: var(--comp-mid); color: var(--comp); }
+.region-tag {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 500;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  margin: 1px;
+}
+.region-tag.hit { background: #FEF9C3; border-color: #FDE047; color: #78350F; }
+:root[data-theme="dark"] .region-tag.hit,
+:root:not([data-theme="light"]) .region-tag.hit {
+  /* applied via JS class, ensure readable in dark */
+}
+
+/* ── Price chart ────────────────────────────────────────── */
+.chart-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 24px;
+  overflow-x: auto;
+}
+.chart-panel h3 {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.bar-chart { width: 100%; }
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.bar-label {
+  width: 80px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  text-align: right;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.bar-track {
+  flex: 1;
+  height: 22px;
+  background: var(--surface2);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width .6s cubic-bezier(.4,0,.2,1);
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+}
+.bar-fill.tsel { background: var(--tsel); }
+.bar-fill.comp { background: var(--comp); }
+.bar-value {
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.bar-value-outside {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Sentiment panel ────────────────────────────────────── */
+.sentiment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.sentiment-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow);
+}
+.sentiment-card .sc-brand {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sc-role {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.sc-role.tsel { background: var(--tsel-light); color: var(--tsel); }
+.sc-role.comp { background: var(--comp-light); color: var(--comp); }
+.sentiment-bars { display: flex; flex-direction: column; gap: 5px; }
+.sbar-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sbar-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.sbar-dot.pos { background: var(--pos); }
+.sbar-dot.neg { background: var(--neg); }
+.sbar-dot.neu { background: var(--neu); }
+.sbar-name {
+  width: 52px;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.sbar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--surface2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.sbar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width .5s ease;
+}
+.sbar-fill.pos { background: var(--pos); }
+.sbar-fill.neg { background: var(--neg); }
+.sbar-fill.neu { background: var(--neu); }
+.sbar-count {
+  width: 20px;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ── Promo cards ────────────────────────────────────────── */
+.promo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.promo-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: box-shadow .15s, transform .15s;
+}
+.promo-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.promo-card .pc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.promo-card .pc-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+  flex: 1;
+  margin-right: 8px;
+}
+.promo-card .pc-price {
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.pc-price.tsel { color: var(--tsel); }
+.pc-price.comp { color: var(--comp); }
+.promo-card .pc-snippet {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.promo-card .pc-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+.pc-regions { display: flex; flex-wrap: wrap; gap: 3px; }
+
+/* ── Program / Service cards ─────────────────────────────── */
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.info-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  box-shadow: var(--shadow);
+}
+.info-item .ii-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.ii-icon.tsel { background: var(--tsel-light); }
+.ii-icon.comp { background: var(--comp-light); }
+.info-item .ii-body { flex: 1; min-width: 0; }
+.ii-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ii-snippet {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.ii-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 5px;
+}
+
+/* ── Empty state ─────────────────────────────────────────── */
+.empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-faint);
+  font-size: 13px;
+}
+
+/* ── Visibility helper ──────────────────────────────────── */
+.hidden { display: none !important; }
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .topbar-row2 { flex-direction: column; align-items: flex-start; }
+  .filter-section { border-right: none; padding-right: 0; margin-right: 0; border-bottom: 1px solid var(--border); padding-bottom: 8px; width: 100%; }
+  .filter-section:last-child { border-bottom: none; }
+  .summary-strip { grid-template-columns: 1fr 1fr; }
+  .bar-label { width: 60px; font-size: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar-fill, .sbar-fill { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Top bar ─────────────────────────────────────────── -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-row1">
+      <div class="brand-lockup">
+        <div class="brand-dot"></div>
+        <div>
+          <div class="brand-name">Competitive Intel</div>
+          <div class="brand-sub">Telkomsel · KTI Region</div>
+        </div>
+      </div>
+      <div class="topbar-meta">
+        <span class="last-updated" id="lastUpdated">Last updated: —</span>
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">☀</button>
+      </div>
+    </div>
+
+    <div class="topbar-row2">
+      <!-- Brand type -->
+      <div class="filter-section">
+        <span class="filter-label">Segmen</span>
+        <div class="toggle-group">
+          <button class="toggle-btn active-mobile" id="btn-mobile" onclick="setBrandType('mobile')">📱 Mobile</button>
+          <button class="toggle-btn" id="btn-fixed" onclick="setBrandType('fixed')">🏠 Fixed</button>
+        </div>
+      </div>
+
+      <!-- Region -->
+      <div class="filter-section">
+        <span class="filter-label">Region</span>
+        <div class="region-chips">
+          <div class="chip active" data-region="all" onclick="setRegion('all')">Semua</div>
+          <div class="chip" data-region="kalimantan" onclick="setRegion('kalimantan')">Kalimantan</div>
+          <div class="chip" data-region="sulawesi" onclick="setRegion('sulawesi')">Sulawesi</div>
+          <div class="chip" data-region="maluku" onclick="setRegion('maluku')">Maluku</div>
+          <div class="chip" data-region="papua" onclick="setRegion('papua')">Papua</div>
+        </div>
+      </div>
+
+      <!-- Category -->
+      <div class="filter-section">
+        <span class="filter-label">Kategori</span>
+        <div class="cat-tabs">
+          <button class="cat-tab active" data-cat="product" onclick="setCategory('product')">Produk</button>
+          <button class="cat-tab" data-cat="promo" onclick="setCategory('promo')">Promo</button>
+          <button class="cat-tab" data-cat="program" onclick="setCategory('program')">Program</button>
+          <button class="cat-tab" data-cat="service" onclick="setCategory('service')">Layanan</button>
+          <button class="cat-tab" data-cat="complaint" onclick="setCategory('complaint')">Complaint</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Main content ────────────────────────────────────── -->
+<div class="page">
+
+  <!-- Summary strip -->
+  <div class="summary-strip" id="summaryStrip"></div>
+
+  <!-- Dynamic content area -->
+  <div id="contentArea"></div>
+
+</div>
+
+<script>
+/* ─── Mock data ─────────────────────────────────────────── */
+const MOCK = {
+  mobile: {
+    competitor: [
+      // XL products
+      { brand:"XL", segment:"mass", category:"product", brand_type:"mobile", role:"competitor",
+        name:"Paket Data XL Xtra 10GB 30 Hari", price:55000, quota:"10 GB", validity:"30 hari",
+        regions:["kalimantan","balikpapan"], raw_snippet:"Paket Data XL Xtra 10GB 30 Hari — Rp 55.000 · Kuota 10 GB · Berlaku 30 hari. Tersedia di Balikpapan dan Kalimantan." },
+      { brand:"XL", segment:"mass", category:"product", brand_type:"mobile", role:"competitor",
+        name:"Paket Combo XL 25GB + Telpon", price:89000, quota:"25 GB", validity:"30 hari",
+        regions:["sulawesi","makassar"], raw_snippet:"Paket Combo XL 25GB + Telpon — Rp 89.000 · 25 GB data + 100 menit. Makassar, Sulawesi." },
+      { brand:"XL", segment:"mass", category:"product", brand_type:"mobile", role:"competitor",
+        name:"Paket Mingguan XL 5GB", price:25000, quota:"5 GB", validity:"7 hari",
+        regions:[], raw_snippet:"Paket Mingguan XL 5GB — Rp 25.000 · 7 hari." },
+      { brand:"XL", segment:"mass", category:"promo", brand_type:"mobile", role:"competitor",
+        title:"Cashback 30% Pembelian Perdana XL", price:null, regions:["kalimantan"],
+        snippet:"Dapatkan cashback 30% untuk pembelian perdana XL di wilayah Kalimantan. Gratis paket data 1GB bonus." },
+      { brand:"XL", segment:"mass", category:"program", brand_type:"mobile", role:"competitor",
+        title:"XL Prioritas Loyalty Program", regions:[], snippet:"Program reward poin untuk pelanggan setia XL Prioritas. Tukar poin dengan diskon paket." },
+      { brand:"XL", segment:"mass", category:"service", brand_type:"mobile", role:"competitor",
+        title:"Jaringan 4G LTE XL di Kalimantan", regions:["kalimantan","samarinda"],
+        snippet:"Coverage 4G LTE XL tersedia di Samarinda dan seluruh Kalimantan Timur. Kecepatan rata-rata 25 Mbps." },
+      { brand:"XL", segment:"mass", category:"complaint", brand_type:"mobile", role:"competitor",
+        title:"Sinyal lemot di Papua", sentiment:"negative", regions:["papua","jayapura"],
+        snippet:"Sinyal XL sangat lemot di Jayapura Papua. Gangguan internet down hampir setiap malam. Kecewa." },
+      { brand:"XL", segment:"mass", category:"complaint", brand_type:"mobile", role:"competitor",
+        title:"Layanan baik di Makassar", sentiment:"positive", regions:["sulawesi","makassar"],
+        snippet:"XL cepat dan stabil di Makassar. Puas dengan layanan. Recommended untuk pengguna Sulawesi." },
+
+      // IOH products
+      { brand:"IOH", segment:"mass", category:"product", brand_type:"mobile", role:"competitor",
+        name:"Freedom Internet 20GB", price:65000, quota:"20 GB", validity:"30 hari",
+        regions:["sulawesi"], raw_snippet:"IM3 Freedom Internet 20GB — Rp 65.000 · 30 hari · Sulawesi." },
+      { brand:"IOH", segment:"mass", category:"product", brand_type:"mobile", role:"competitor",
+        name:"Paket IM3 Always On 1GB/Hari", price:79000, quota:"30 GB", validity:"30 hari",
+        regions:["kalimantan","banjarmasin"], raw_snippet:"IM3 Always On 1GB/Hari — Rp 79.000 · Banjarmasin, Kalimantan." },
+      { brand:"IOH", segment:"mass", category:"promo", brand_type:"mobile", role:"competitor",
+        title:"Promo Hemat IM3 Double Kuota", price:null, regions:["maluku","ambon"],
+        snippet:"Double kuota gratis untuk pembelian paket Freedom di Ambon dan Maluku. Hemat 50% untuk bulan ini." },
+      { brand:"IOH", segment:"mass", category:"program", brand_type:"mobile", role:"competitor",
+        title:"Freedom Poin IM3 Reward", regions:[], snippet:"Kumpulkan Freedom Poin setiap transaksi. Tukar dengan paket data, pulsa, dan benefit lainnya." },
+      { brand:"IOH", segment:"mass", category:"service", brand_type:"mobile", role:"competitor",
+        title:"Coverage IM3 5G di Makassar", regions:["sulawesi","makassar"],
+        snippet:"IM3 menghadirkan jaringan 5G perdana di Makassar. Kecepatan hingga 100 Mbps untuk pelanggan premium." },
+      { brand:"IOH", segment:"mass", category:"complaint", brand_type:"mobile", role:"competitor",
+        title:"Jaringan bagus di Sulawesi", sentiment:"positive", regions:["sulawesi"],
+        snippet:"IM3 bagus dan lancar di Sulawesi. Stabil untuk streaming. Mantap." },
+      { brand:"IOH", segment:"mass", category:"complaint", brand_type:"mobile", role:"competitor",
+        title:"Masalah aktivasi di Papua", sentiment:"negative", regions:["papua","timika"],
+        snippet:"Tidak bisa aktivasi paket IM3 di Timika Papua. Error terus. Masalah sudah 3 hari." },
+
+      // SmartXL/AXIS
+      { brand:"SmartXL", segment:"youth", category:"product", brand_type:"mobile", role:"competitor",
+        name:"AXIS Hitz 5GB Sosmed", price:15000, quota:"5 GB", validity:"7 hari",
+        regions:[], raw_snippet:"AXIS Hitz 5GB Sosmed — Rp 15.000 · 7 hari." },
+      { brand:"SmartXL", segment:"youth", category:"product", brand_type:"mobile", role:"competitor",
+        name:"AXIS Bronet 10GB 30 Hari", price:38000, quota:"10 GB", validity:"30 hari",
+        regions:["kalimantan"], raw_snippet:"AXIS Bronet 10GB — Rp 38.000 · Kalimantan." },
+      { brand:"SmartXL", segment:"youth", category:"promo", brand_type:"mobile", role:"competitor",
+        title:"AXIS Gratis 5GB untuk Pelajar", price:null, regions:["sulawesi"],
+        snippet:"Gratis 5GB ekstra untuk pelajar di Sulawesi yang mendaftar kartu AXIS baru. Special offer bulan pendidikan." },
+      { brand:"SmartXL", segment:"youth", category:"complaint", brand_type:"mobile", role:"competitor",
+        title:"AXIS jelek di pedalaman Kalimantan", sentiment:"negative", regions:["kalimantan"],
+        snippet:"Sinyal AXIS mati total di pedalaman Kalimantan. Tidak bisa dipakai sama sekali. Buruk." },
+      { brand:"SmartXL", segment:"youth", category:"complaint", brand_type:"mobile", role:"competitor",
+        title:"Harga AXIS murah dan oke", sentiment:"positive", regions:[],
+        snippet:"AXIS oke untuk yang butuh internet murah. Harga terjangkau. Baik untuk pelajar." },
+
+      // Tri
+      { brand:"Tri", segment:"youth", category:"product", brand_type:"mobile", role:"competitor",
+        name:"Paket Always On Tri 10GB", price:30000, quota:"10 GB", validity:"30 hari",
+        regions:["gorontalo"], raw_snippet:"Tri Always On 10GB — Rp 30.000 · 30 hari · Gorontalo." },
+      { brand:"Tri", segment:"youth", category:"product", brand_type:"mobile", role:"competitor",
+        name:"Tri Bmax 20GB", price:50000, quota:"20 GB", validity:"30 hari",
+        regions:["sulawesi","manado"], raw_snippet:"Tri Bmax 20GB — Rp 50.000 · Manado, Sulawesi." },
+      { brand:"Tri", segment:"youth", category:"promo", brand_type:"mobile", role:"competitor",
+        title:"Bonus 2x Kuota Tri Weekend", price:null, regions:[],
+        snippet:"Dapatkan bonus 2x kuota setiap weekend. Cashback 20% untuk pembelian via aplikasi." },
+      { brand:"Tri", segment:"youth", category:"complaint", brand_type:"mobile", role:"competitor",
+        title:"Tri cepat di Manado", sentiment:"positive", regions:["sulawesi","manado"],
+        snippet:"Tri lancar dan cepat di Manado. Stabil untuk main game. Puas dengan layanannya." },
+      { brand:"Tri", segment:"youth", category:"service", brand_type:"mobile", role:"competitor",
+        title:"Tri 4G di Sulawesi Utara", regions:["sulawesi","manado","gorontalo"],
+        snippet:"Jaringan 4G Tri sudah menjangkau Manado dan Gorontalo di Sulawesi Utara. Speed rata-rata 18 Mbps." },
+    ],
+    telkomsel: [
+      // SIMPATI
+      { brand:"SIMPATI", segment:"mass", category:"product", brand_type:"mobile", role:"telkomsel",
+        name:"Paket Internet SIMPATI 15GB", price:70000, quota:"15 GB", validity:"30 hari",
+        regions:["kalimantan","papua"], raw_snippet:"SIMPATI 15GB — Rp 70.000 · Tersedia di Kalimantan dan Papua." },
+      { brand:"SIMPATI", segment:"mass", category:"product", brand_type:"mobile", role:"telkomsel",
+        name:"SIMPATI Combo Max 30GB", price:99000, quota:"30 GB", validity:"30 hari",
+        regions:["sulawesi","maluku"], raw_snippet:"SIMPATI Combo Max 30GB — Rp 99.000 · Sulawesi, Maluku." },
+      { brand:"SIMPATI", segment:"mass", category:"product", brand_type:"mobile", role:"telkomsel",
+        name:"SIMPATI Mingguan 8GB", price:29000, quota:"8 GB", validity:"7 hari",
+        regions:[], raw_snippet:"SIMPATI Mingguan 8GB — Rp 29.000." },
+      { brand:"SIMPATI", segment:"mass", category:"promo", brand_type:"mobile", role:"telkomsel",
+        title:"SIMPATI Special KTI 50% Off", price:null, regions:["kalimantan","sulawesi","maluku","papua"],
+        snippet:"Diskon 50% paket data SIMPATI untuk pelanggan di wilayah KTI — Kalimantan, Sulawesi, Maluku, Papua. Cashback via MyTelkomsel." },
+      { brand:"SIMPATI", segment:"mass", category:"program", brand_type:"mobile", role:"telkomsel",
+        title:"Telkomsel Poin SIMPATI", regions:[], snippet:"Kumpulkan Telkomsel Poin dari setiap transaksi. Tukar dengan berbagai reward menarik dan paket bundling." },
+      { brand:"SIMPATI", segment:"mass", category:"service", brand_type:"mobile", role:"telkomsel",
+        title:"Jaringan 4G/5G SIMPATI di Kalimantan", regions:["kalimantan","balikpapan","samarinda"],
+        snippet:"Telkomsel 4G/5G tersedia di Balikpapan, Samarinda, dan Kalimantan. Coverage terluas se-Indonesia." },
+      { brand:"SIMPATI", segment:"mass", category:"service", brand_type:"mobile", role:"telkomsel",
+        title:"SIMPATI Coverage Papua & Maluku", regions:["papua","maluku","jayapura","ambon"],
+        snippet:"Jaringan Telkomsel menjangkau Jayapura dan Ambon. 4G LTE di ibukota Papua dan Maluku." },
+      { brand:"SIMPATI", segment:"mass", category:"complaint", brand_type:"mobile", role:"telkomsel",
+        title:"Sinyal SIMPATI stabil di pelosok", sentiment:"positive", regions:["papua","kalimantan"],
+        snippet:"SIMPATI satu-satunya yang bagus di daerah terpencil Kalimantan dan Papua. Stabil dan bisa diandalkan. Recommended!" },
+      { brand:"SIMPATI", segment:"mass", category:"complaint", brand_type:"mobile", role:"telkomsel",
+        title:"Harga SIMPATI terlalu mahal", sentiment:"negative", regions:[],
+        snippet:"SIMPATI terlalu mahal dibanding kompetitor. Tidak bisa bayar paket dengan harga segini." },
+
+      // byU
+      { brand:"byU", segment:"youth", category:"product", brand_type:"mobile", role:"telkomsel",
+        name:"byU 10GB Sesuai Selera", price:39000, quota:"10 GB", validity:"30 hari",
+        regions:[], raw_snippet:"byU 10GB — Rp 39.000 · Custom sesuai kebutuhan." },
+      { brand:"byU", segment:"youth", category:"product", brand_type:"mobile", role:"telkomsel",
+        name:"byU 20GB + Games", price:59000, quota:"20 GB", validity:"30 hari",
+        regions:["sulawesi"], raw_snippet:"byU 20GB + Games — Rp 59.000 · Sulawesi." },
+      { brand:"byU", segment:"youth", category:"promo", brand_type:"mobile", role:"telkomsel",
+        title:"byU Flash Sale 3GB Rp 5.000", price:5000, regions:[],
+        snippet:"Flash sale byU! 3GB hanya Rp 5.000 untuk pengguna baru. Hemat dan special untuk pelajar dan mahasiswa." },
+      { brand:"byU", segment:"youth", category:"program", brand_type:"mobile", role:"telkomsel",
+        title:"byU Cashback Program", regions:[], snippet:"Cashback 10% setiap pembelian paket byU via aplikasi. Gratis ongkir belanja online dengan paket bundling." },
+      { brand:"byU", segment:"youth", category:"complaint", brand_type:"mobile", role:"telkomsel",
+        title:"byU mantap untuk anak muda", sentiment:"positive", regions:[],
+        snippet:"byU oke banget! Harga terjangkau, bisa custom paket sendiri. Lancar untuk konten dan gaming. Mantap." },
+      { brand:"byU", segment:"youth", category:"service", brand_type:"mobile", role:"telkomsel",
+        title:"byU 4G di Sulawesi dan Kalimantan", regions:["sulawesi","kalimantan"],
+        snippet:"byU menggunakan jaringan Telkomsel 4G yang tersebar luas di Sulawesi dan Kalimantan." },
+
+      // Halo
+      { brand:"Halo", segment:"premium", category:"product", brand_type:"mobile", role:"telkomsel",
+        name:"Halo Fit 50GB Pascabayar", price:199000, quota:"50 GB", validity:"30 hari",
+        regions:[], raw_snippet:"Halo Fit 50GB — Rp 199.000/bulan · Pascabayar premium." },
+      { brand:"Halo", segment:"premium", category:"product", brand_type:"mobile", role:"telkomsel",
+        name:"Halo Infinite Unlimited", price:349000, quota:"Unlimited", validity:"30 hari",
+        regions:[], raw_snippet:"Halo Infinite Unlimited — Rp 349.000/bulan · Pascabayar." },
+      { brand:"Halo", segment:"premium", category:"promo", brand_type:"mobile", role:"telkomsel",
+        title:"Halo Promo Cicilan Device 0%", price:null, regions:[],
+        snippet:"Cicilan 0% untuk pembelian smartphone premium bagi pelanggan Halo. Installment 12-24 bulan tanpa bunga." },
+      { brand:"Halo", segment:"premium", category:"program", brand_type:"mobile", role:"telkomsel",
+        title:"Halo Privilege Benefit Premium", regions:[], snippet:"Benefit eksklusif untuk pelanggan Halo: airport lounge, loyalty reward, prioritas layanan 24/7." },
+      { brand:"Halo", segment:"premium", category:"complaint", brand_type:"mobile", role:"telkomsel",
+        title:"Halo layanan premium memuaskan", sentiment:"positive", regions:[],
+        snippet:"Layanan Halo premium memuaskan. CS responsif, jaringan stabil. Puas berlangganan. Bagus." },
+    ],
+  },
+  fixed: {
+    competitor: [
+      { brand:"MyRepublic", segment:"home", category:"product", brand_type:"fixed", role:"competitor",
+        name:"MyRepublic 30 Mbps", price:249000, quota:"Unlimited", validity:"30 hari",
+        regions:["sulawesi","makassar"], raw_snippet:"MyRepublic 30 Mbps — Rp 249.000/bulan · Fiber optik · Makassar, Sulawesi." },
+      { brand:"MyRepublic", segment:"home", category:"product", brand_type:"fixed", role:"competitor",
+        name:"MyRepublic 100 Mbps Gamer", price:449000, quota:"Unlimited", validity:"30 hari",
+        regions:[], raw_snippet:"MyRepublic 100 Mbps Gamer — Rp 449.000/bulan." },
+      { brand:"MyRepublic", segment:"home", category:"promo", brand_type:"fixed", role:"competitor",
+        title:"Gratis Instalasi MyRepublic", price:null, regions:["sulawesi"],
+        snippet:"Gratis biaya instalasi untuk pendaftaran baru MyRepublic di Sulawesi. Cashback Rp 100.000 bulan pertama." },
+      { brand:"MyRepublic", segment:"home", category:"complaint", brand_type:"fixed", role:"competitor",
+        title:"MyRepublic down sering di Makassar", sentiment:"negative", regions:["sulawesi","makassar"],
+        snippet:"Jaringan MyRepublic sering mati di Makassar. Gangguan hampir tiap minggu. Tidak bisa kerja." },
+      { brand:"MyRepublic", segment:"home", category:"service", brand_type:"fixed", role:"competitor",
+        title:"Fiber FTTH MyRepublic Sulawesi", regions:["sulawesi","makassar"],
+        snippet:"FTTH MyRepublic tersedia di Makassar. Kecepatan hingga 1 Gbps dengan teknologi fiber optik." },
+
+      { brand:"Icon Net", segment:"home", category:"product", brand_type:"fixed", role:"competitor",
+        name:"Icon Net 50 Mbps Home", price:299000, quota:"Unlimited", validity:"30 hari",
+        regions:["kalimantan","balikpapan"], raw_snippet:"Icon Net 50 Mbps — Rp 299.000/bulan · Balikpapan, Kalimantan." },
+      { brand:"Icon Net", segment:"home", category:"product", brand_type:"fixed", role:"competitor",
+        name:"Icon Net 150 Mbps Business", price:599000, quota:"Unlimited", validity:"30 hari",
+        regions:["kalimantan"], raw_snippet:"Icon Net 150 Mbps Business — Rp 599.000/bulan · Kalimantan." },
+      { brand:"Icon Net", segment:"home", category:"promo", brand_type:"fixed", role:"competitor",
+        title:"Icon Net Diskon 3 Bulan Pertama", price:null, regions:["kalimantan"],
+        snippet:"Diskon 50% selama 3 bulan pertama untuk pelanggan baru Icon Net di Kalimantan. Hemat hingga Rp 900.000." },
+      { brand:"Icon Net", segment:"home", category:"complaint", brand_type:"fixed", role:"competitor",
+        title:"Icon Net stabil di Balikpapan", sentiment:"positive", regions:["kalimantan","balikpapan"],
+        snippet:"Icon Net bagus di Balikpapan. Cepat dan stabil. Speed sesuai paket. Puas." },
+
+      { brand:"BizNet", segment:"home", category:"product", brand_type:"fixed", role:"competitor",
+        name:"BizNet Home 20 Mbps", price:199000, quota:"Unlimited", validity:"30 hari",
+        regions:[], raw_snippet:"BizNet Home 20 Mbps — Rp 199.000/bulan." },
+      { brand:"BizNet", segment:"home", category:"product", brand_type:"fixed", role:"competitor",
+        name:"BizNet Fiber 100 Mbps", price:399000, quota:"Unlimited", validity:"30 hari",
+        regions:["sulawesi"], raw_snippet:"BizNet Fiber 100 Mbps — Rp 399.000/bulan · Sulawesi." },
+      { brand:"BizNet", segment:"home", category:"complaint", brand_type:"fixed", role:"competitor",
+        title:"BizNet coverage terbatas", sentiment:"negative", regions:[],
+        snippet:"BizNet tidak ada di area saya. Coverage masih terbatas. Susah dapat sinyal di area pinggiran." },
+    ],
+    telkomsel: [
+      { brand:"IndiHome", segment:"home", category:"product", brand_type:"fixed", role:"telkomsel",
+        name:"IndiHome 10 Mbps", price:280000, quota:"Unlimited", validity:"30 hari",
+        regions:["kalimantan","sulawesi","maluku","papua"], raw_snippet:"IndiHome 10 Mbps — Rp 280.000/bulan · Coverage KTI." },
+      { brand:"IndiHome", segment:"home", category:"product", brand_type:"fixed", role:"telkomsel",
+        name:"IndiHome 30 Mbps + UseeTV", price:420000, quota:"Unlimited", validity:"30 hari",
+        regions:["kalimantan","sulawesi"], raw_snippet:"IndiHome 30 Mbps + UseeTV — Rp 420.000/bulan · Kalimantan, Sulawesi." },
+      { brand:"IndiHome", segment:"home", category:"product", brand_type:"fixed", role:"telkomsel",
+        name:"IndiHome 100 Mbps Fiber", price:680000, quota:"Unlimited", validity:"30 hari",
+        regions:[], raw_snippet:"IndiHome 100 Mbps Fiber — Rp 680.000/bulan." },
+      { brand:"IndiHome", segment:"home", category:"promo", brand_type:"fixed", role:"telkomsel",
+        title:"IndiHome Gratis 2 Bulan KTI", price:null, regions:["kalimantan","sulawesi","maluku","papua"],
+        snippet:"Gratis 2 bulan berlangganan IndiHome untuk pendaftaran baru di wilayah KTI. Bonus UseeTV gratis 6 bulan." },
+      { brand:"IndiHome", segment:"home", category:"program", brand_type:"fixed", role:"telkomsel",
+        title:"IndiHome Bundling Halo Postpaid", regions:[], snippet:"Bundling IndiHome + Halo Postpaid hemat hingga 30%. Nikmati layanan fixed dan mobile dalam satu tagihan." },
+      { brand:"IndiHome", segment:"home", category:"service", brand_type:"fixed", role:"telkomsel",
+        title:"IndiHome FTTH Kalimantan & Papua", regions:["kalimantan","papua","jayapura","balikpapan"],
+        snippet:"Fiber FTTH IndiHome tersedia di Balikpapan, Samarinda, dan Jayapura. Coverage KTI terluas." },
+      { brand:"IndiHome", segment:"home", category:"complaint", brand_type:"fixed", role:"telkomsel",
+        title:"IndiHome satu-satunya pilihan di Papua", sentiment:"positive", regions:["papua","jayapura","manokwari"],
+        snippet:"Di Papua dan Manokwari, IndiHome satu-satunya internet rumah yang ada. Bagus dan lancar. Puas." },
+      { brand:"IndiHome", segment:"home", category:"complaint", brand_type:"fixed", role:"telkomsel",
+        title:"IndiHome mahal dan lambat", sentiment:"negative", regions:[],
+        snippet:"IndiHome masih lambat dan mahal. Tidak sesuai dengan harga. Kecewa dengan kecepatan aktual." },
+
+      { brand:"EZnet", segment:"business", category:"product", brand_type:"fixed", role:"telkomsel",
+        name:"EZnet Business 50 Mbps", price:1500000, quota:"Unlimited", validity:"30 hari",
+        regions:["kalimantan","sulawesi"], raw_snippet:"EZnet Business 50 Mbps — Rp 1.500.000/bulan · SLA guarantee." },
+      { brand:"EZnet", segment:"business", category:"product", brand_type:"fixed", role:"telkomsel",
+        name:"EZnet Enterprise 200 Mbps", price:4500000, quota:"Unlimited", validity:"30 hari",
+        regions:[], raw_snippet:"EZnet Enterprise 200 Mbps — Rp 4.500.000/bulan." },
+      { brand:"EZnet", segment:"business", category:"complaint", brand_type:"fixed", role:"telkomsel",
+        title:"EZnet uptime SLA terjamin", sentiment:"positive", regions:["kalimantan"],
+        snippet:"EZnet uptime 99.9% di Kalimantan. SLA terpenuhi. Sangat reliable untuk kebutuhan bisnis. Recommended." },
+    ],
+  }
+};
+
+/* ─── State ─────────────────────────────────────────────── */
+let state = {
+  brandType: 'mobile',
+  region: 'all',
+  category: 'product',
+  data: null,
+};
+
+const REGION_GROUPS = {
+  kalimantan: ["kalimantan","balikpapan","samarinda","banjarmasin","pontianak","palangkaraya"],
+  sulawesi:   ["sulawesi","makassar","manado","palu","kendari","gorontalo"],
+  maluku:     ["maluku","ambon","ternate","sorong"],
+  papua:      ["papua","jayapura","timika","merauke","manokwari"],
+};
+
+function matchesRegion(item) {
+  if (state.region === 'all') return true;
+  const groupWords = REGION_GROUPS[state.region] || [];
+  return (item.regions || []).some(r => groupWords.includes(r));
+}
+
+function filterItems(items) {
+  return items.filter(item =>
+    item.category === state.category && matchesRegion(item)
+  );
+}
+
+function getAllItems() {
+  if (!state.data) return { comp: [], tsel: [] };
+  const bd = state.data[state.brandType] || {};
+  return {
+    comp: filterItems(bd.competitor || []),
+    tsel: filterItems(bd.telkomsel  || []),
+  };
+}
+
+/* ─── Formatters ────────────────────────────────────────── */
+function fmtPrice(p) {
+  if (!p && p !== 0) return '—';
+  return 'Rp ' + p.toLocaleString('id-ID');
+}
+function regionTags(regions) {
+  if (!regions || !regions.length) return '<span style="color:var(--text-faint);font-size:10px;">—</span>';
+  const grp = state.region !== 'all' ? (REGION_GROUPS[state.region] || []) : [];
+  return regions.slice(0,3).map(r => {
+    const hit = grp.length && grp.includes(r);
+    return `<span class="region-tag${hit?' hit':''}">${r}</span>`;
+  }).join('');
+}
+
+/* ─── Render: Summary strip ─────────────────────────────── */
+function renderSummary() {
+  const bd = state.data ? (state.data[state.brandType] || {}) : {};
+  const allComp = (bd.competitor || []).filter(i => matchesRegion(i));
+  const allTsel = (bd.telkomsel  || []).filter(i => matchesRegion(i));
+
+  const compBrands = [...new Set(allComp.map(i => i.brand))].length;
+  const tselBrands = [...new Set(allTsel.map(i => i.brand))].length;
+  const compPromos = allComp.filter(i => i.category === 'promo').length;
+  const tselPromos = allTsel.filter(i => i.category === 'promo').length;
+  const compProducts = allComp.filter(i => i.category === 'product');
+  const tselProducts = allTsel.filter(i => i.category === 'product');
+  const avgCompPrice = compProducts.length
+    ? Math.round(compProducts.reduce((s,i) => s + (i.price||0), 0) / compProducts.length) : 0;
+  const avgTselPrice = tselProducts.length
+    ? Math.round(tselProducts.reduce((s,i) => s + (i.price||0), 0) / tselProducts.length) : 0;
+
+  document.getElementById('summaryStrip').innerHTML = `
+    <div class="stat-card comp">
+      <div class="label">Kompetitor</div>
+      <div class="value">${allComp.length}</div>
+      <div class="sub">${compBrands} brand · ${compPromos} promo</div>
+    </div>
+    <div class="stat-card tsel">
+      <div class="label">Telkomsel</div>
+      <div class="value">${allTsel.length}</div>
+      <div class="sub">${tselBrands} brand · ${tselPromos} promo</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Avg. Harga Kompetitor</div>
+      <div class="value" style="font-size:18px;color:var(--comp)">${fmtPrice(avgCompPrice)}</div>
+      <div class="sub">${compProducts.length} produk</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Avg. Harga Telkomsel</div>
+      <div class="value" style="font-size:18px;color:var(--tsel)">${fmtPrice(avgTselPrice)}</div>
+      <div class="sub">${tselProducts.length} produk</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Region Filter</div>
+      <div class="value" style="font-size:16px;font-weight:700;text-transform:capitalize;color:var(--text)">${state.region === 'all' ? 'Semua' : state.region.charAt(0).toUpperCase()+state.region.slice(1)}</div>
+      <div class="sub">${state.brandType === 'mobile' ? 'Mobile network' : 'Fixed broadband'}</div>
+    </div>
+  `;
+}
+
+/* ─── Render: Product table ─────────────────────────────── */
+function renderProductTable(items, role) {
+  const cls = role === 'telkomsel' ? 'tsel' : 'comp';
+  if (!items.length) return `<div class="empty">Tidak ada data untuk filter ini.</div>`;
+  const rows = items.map(item => `
+    <tr>
+      <td><span class="brand-chip ${cls}">${item.brand}</span></td>
+      <td>${item.name || item.title || '—'}</td>
+      <td class="price ${cls === 'tsel' ? '' : ''}" style="color:var(--${cls})">${fmtPrice(item.price)}</td>
+      <td class="muted">${item.quota || '—'}</td>
+      <td class="muted">${item.validity || '—'}</td>
+      <td>${regionTags(item.regions)}</td>
+    </tr>`).join('');
+  return `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="${cls}-col">Brand</th>
+            <th class="${cls}-col">Produk</th>
+            <th class="${cls}-col">Harga</th>
+            <th class="${cls}-col">Kuota</th>
+            <th class="${cls}-col">Validitas</th>
+            <th class="${cls}-col">Region</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+/* ─── Render: Price bar chart ───────────────────────────── */
+function renderPriceChart(compItems, tselItems) {
+  const allProducts = [
+    ...compItems.filter(i => i.price),
+    ...tselItems.filter(i => i.price),
+  ];
+  if (!allProducts.length) return '';
+
+  const maxPrice = Math.max(...allProducts.map(i => i.price));
+  if (!maxPrice) return '';
+
+  const compRows = compItems.filter(i => i.price).slice(0,6).map(item => {
+    const pct = Math.max(4, Math.round((item.price / maxPrice) * 100));
+    const label = (item.name || '').length > 24 ? (item.name||'').slice(0,24)+'…' : (item.name||'—');
+    const inside = pct > 30;
+    return `
+      <div class="bar-row">
+        <div class="bar-label">${item.brand}</div>
+        <div class="bar-track">
+          <div class="bar-fill comp" style="width:${pct}%">
+            ${inside ? `<span class="bar-value">${fmtPrice(item.price)}</span>` : ''}
+          </div>
+        </div>
+        ${!inside ? `<span class="bar-value-outside">${fmtPrice(item.price)}</span>` : ''}
+      </div>`;
+  }).join('');
+
+  const tselRows = tselItems.filter(i => i.price).slice(0,6).map(item => {
+    const pct = Math.max(4, Math.round((item.price / maxPrice) * 100));
+    const inside = pct > 30;
+    return `
+      <div class="bar-row">
+        <div class="bar-label">${item.brand}</div>
+        <div class="bar-track">
+          <div class="bar-fill tsel" style="width:${pct}%">
+            ${inside ? `<span class="bar-value">${fmtPrice(item.price)}</span>` : ''}
+          </div>
+        </div>
+        ${!inside ? `<span class="bar-value-outside">${fmtPrice(item.price)}</span>` : ''}
+      </div>`;
+  }).join('');
+
+  if (!compRows && !tselRows) return '';
+
+  return `
+    <div class="chart-panel">
+      <h3>Perbandingan Harga Produk</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;min-width:400px">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--comp);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Kompetitor</div>
+          <div class="bar-chart">${compRows || '<div class="empty" style="padding:12px">—</div>'}</div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--tsel);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Telkomsel</div>
+          <div class="bar-chart">${tselRows || '<div class="empty" style="padding:12px">—</div>'}</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ─── Render: Sentiment ─────────────────────────────────── */
+function renderSentiment(compItems, tselItems) {
+  function brandSentiment(items) {
+    const brands = {};
+    items.forEach(item => {
+      if (!brands[item.brand]) brands[item.brand] = { pos:0, neg:0, neu:0, role: item.role };
+      const s = item.sentiment || 'neutral';
+      brands[item.brand][s === 'positive' ? 'pos' : s === 'negative' ? 'neg' : 'neu']++;
+    });
+    return brands;
+  }
+  const compB = brandSentiment(compItems);
+  const tselB = brandSentiment(tselItems);
+  const allB = { ...compB, ...tselB };
+  if (!Object.keys(allB).length) return '';
+
+  const cards = Object.entries(allB).map(([brand, counts]) => {
+    const total = counts.pos + counts.neg + counts.neu || 1;
+    const role = counts.role;
+    const cls = role === 'telkomsel' ? 'tsel' : 'comp';
+    return `
+      <div class="sentiment-card">
+        <div class="sc-brand">
+          ${brand}
+          <span class="sc-role ${cls}">${role === 'telkomsel' ? 'Telkomsel' : 'Kompetitor'}</span>
+        </div>
+        <div class="sentiment-bars">
+          <div class="sbar-row">
+            <div class="sbar-dot pos"></div>
+            <div class="sbar-name">Positif</div>
+            <div class="sbar-track"><div class="sbar-fill pos" style="width:${Math.round(counts.pos/total*100)}%"></div></div>
+            <div class="sbar-count">${counts.pos}</div>
+          </div>
+          <div class="sbar-row">
+            <div class="sbar-dot neg"></div>
+            <div class="sbar-name">Negatif</div>
+            <div class="sbar-track"><div class="sbar-fill neg" style="width:${Math.round(counts.neg/total*100)}%"></div></div>
+            <div class="sbar-count">${counts.neg}</div>
+          </div>
+          <div class="sbar-row">
+            <div class="sbar-dot neu"></div>
+            <div class="sbar-name">Netral</div>
+            <div class="sbar-track"><div class="sbar-fill neu" style="width:${Math.round(counts.neu/total*100)}%"></div></div>
+            <div class="sbar-count">${counts.neu}</div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div>
+      <div class="section-head">
+        <span class="section-title">Sentimen Ulasan</span>
+        <span class="section-desc">Positif · Negatif · Netral per brand</span>
+      </div>
+      <div class="sentiment-grid">${cards}</div>
+    </div>`;
+}
+
+/* ─── Render: Promo cards ───────────────────────────────── */
+function renderPromoCards(items, role) {
+  const cls = role === 'telkomsel' ? 'tsel' : 'comp';
+  if (!items.length) return `<div class="empty">Tidak ada promo untuk filter ini.</div>`;
+  return `<div class="promo-grid">${items.map(item => `
+    <div class="promo-card">
+      <div class="pc-header">
+        <div class="pc-title">${item.title || '—'}</div>
+        ${item.price ? `<div class="pc-price ${cls}">${fmtPrice(item.price)}</div>` : ''}
+      </div>
+      <div class="pc-snippet">${item.snippet || '—'}</div>
+      <div class="pc-footer">
+        <div class="pc-regions">${regionTags(item.regions)}</div>
+        <span class="brand-chip ${cls}">${item.brand}</span>
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+/* ─── Render: Info list (program / service) ──────────────── */
+function renderInfoList(items, role) {
+  const cls = role === 'telkomsel' ? 'tsel' : 'comp';
+  const icon = role === 'telkomsel' ? '★' : '◆';
+  if (!items.length) return `<div class="empty">Tidak ada data untuk filter ini.</div>`;
+  return `<div class="info-list">${items.map(item => `
+    <div class="info-item">
+      <div class="ii-icon ${cls}">${icon}</div>
+      <div class="ii-body">
+        <div class="ii-title">${item.title || '—'}</div>
+        <div class="ii-snippet">${item.snippet || item.raw_snippet || '—'}</div>
+        <div class="ii-meta">
+          <span class="brand-chip ${cls}">${item.brand}</span>
+          ${regionTags(item.regions)}
+        </div>
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+/* ─── Render: Complaint list ────────────────────────────── */
+function renderComplaintList(items, role) {
+  const cls = role === 'telkomsel' ? 'tsel' : 'comp';
+  if (!items.length) return `<div class="empty">Tidak ada data untuk filter ini.</div>`;
+  return `<div class="info-list">${items.map(item => {
+    const s = item.sentiment || 'neutral';
+    const sColor = s === 'positive' ? 'var(--pos)' : s === 'negative' ? 'var(--neg)' : 'var(--neu)';
+    const sBg = s === 'positive' ? 'var(--pos-light)' : s === 'negative' ? 'var(--neg-light)' : 'var(--neu-light)';
+    const sLabel = s === 'positive' ? 'Positif' : s === 'negative' ? 'Negatif' : 'Netral';
+    return `
+    <div class="info-item">
+      <div class="ii-icon ${cls}" style="background:${sBg};color:${sColor};font-size:11px;font-weight:700;letter-spacing:.02em">${sLabel.slice(0,3)}</div>
+      <div class="ii-body">
+        <div class="ii-title">${item.title || '—'}</div>
+        <div class="ii-snippet">${item.snippet || item.raw_snippet || '—'}</div>
+        <div class="ii-meta">
+          <span class="brand-chip ${cls}">${item.brand}</span>
+          <span style="font-size:10px;font-weight:600;color:${sColor};background:${sBg};padding:2px 7px;border-radius:10px">${sLabel}</span>
+          ${regionTags(item.regions)}
+        </div>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* ─── Main render ───────────────────────────────────────── */
+function render() {
+  renderSummary();
+  const { comp, tsel } = getAllItems();
+
+  let html = '';
+
+  if (state.category === 'product') {
+    html += `
+      <div class="section-head">
+        <span class="section-title">Produk Kompetitor</span>
+        <span class="section-desc">Paket, harga, kuota</span>
+        <span class="section-badge badge-comp">${comp.length} item</span>
+      </div>
+      ${renderProductTable(comp, 'competitor')}`;
+
+    if (comp.length || tsel.length) {
+      html += renderPriceChart(comp, tsel);
+    }
+
+    html += `
+      <div class="section-head">
+        <span class="section-title">Produk Telkomsel</span>
+        <span class="section-desc">SIMPATI · byU · Halo / IndiHome · EZnet</span>
+        <span class="section-badge badge-tsel">${tsel.length} item</span>
+      </div>
+      ${renderProductTable(tsel, 'telkomsel')}`;
+
+  } else if (state.category === 'promo') {
+    html += `
+      <div class="section-head">
+        <span class="section-title">Promo Kompetitor</span>
+        <span class="section-badge badge-comp">${comp.length} promo</span>
+      </div>
+      ${renderPromoCards(comp, 'competitor')}
+      <div class="section-head">
+        <span class="section-title">Promo Telkomsel</span>
+        <span class="section-badge badge-tsel">${tsel.length} promo</span>
+      </div>
+      ${renderPromoCards(tsel, 'telkomsel')}`;
+
+  } else if (state.category === 'program') {
+    html += `
+      <div class="section-head">
+        <span class="section-title">Program Kompetitor</span>
+        <span class="section-desc">Loyalty, bundling, cicilan</span>
+        <span class="section-badge badge-comp">${comp.length} item</span>
+      </div>
+      ${renderInfoList(comp, 'competitor')}
+      <div class="section-head">
+        <span class="section-title">Program Telkomsel</span>
+        <span class="section-badge badge-tsel">${tsel.length} item</span>
+      </div>
+      ${renderInfoList(tsel, 'telkomsel')}`;
+
+  } else if (state.category === 'service') {
+    html += `
+      <div class="section-head">
+        <span class="section-title">Layanan Kompetitor</span>
+        <span class="section-desc">Coverage, kecepatan, jaringan</span>
+        <span class="section-badge badge-comp">${comp.length} item</span>
+      </div>
+      ${renderInfoList(comp, 'competitor')}
+      <div class="section-head">
+        <span class="section-title">Layanan Telkomsel</span>
+        <span class="section-badge badge-tsel">${tsel.length} item</span>
+      </div>
+      ${renderInfoList(tsel, 'telkomsel')}`;
+
+  } else if (state.category === 'complaint') {
+    html += renderSentiment(comp, tsel);
+    html += `
+      <div class="section-head">
+        <span class="section-title">Ulasan Kompetitor</span>
+        <span class="section-badge badge-comp">${comp.length} ulasan</span>
+      </div>
+      ${renderComplaintList(comp, 'competitor')}
+      <div class="section-head">
+        <span class="section-title">Ulasan Telkomsel</span>
+        <span class="section-badge badge-tsel">${tsel.length} ulasan</span>
+      </div>
+      ${renderComplaintList(tsel, 'telkomsel')}`;
+  }
+
+  document.getElementById('contentArea').innerHTML = html;
+}
+
+/* ─── Control handlers ──────────────────────────────────── */
+function setBrandType(t) {
+  state.brandType = t;
+  document.getElementById('btn-mobile').className = 'toggle-btn' + (t === 'mobile' ? ' active-mobile' : '');
+  document.getElementById('btn-fixed').className  = 'toggle-btn' + (t === 'fixed'  ? ' active-fixed'  : '');
+  render();
+}
+
+function setRegion(r) {
+  state.region = r;
+  document.querySelectorAll('.chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.region === r);
+  });
+  render();
+}
+
+function setCategory(c) {
+  state.category = c;
+  document.querySelectorAll('.cat-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.cat === c);
+  });
+  render();
+}
+
+/* ─── Theme toggle ──────────────────────────────────────── */
+function toggleTheme() {
+  const root = document.documentElement;
+  const current = root.getAttribute('data-theme');
+  if (!current) {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    root.setAttribute('data-theme', prefersDark ? 'light' : 'dark');
+  } else {
+    root.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+  }
+  const btn = document.querySelector('.theme-toggle');
+  btn.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀' : '☾';
+}
+
+/* ─── Data loading ──────────────────────────────────────── */
+async function loadData() {
+  try {
+    const resp = await fetch('../data/output.json', { cache: 'no-store' });
+    if (!resp.ok) throw new Error('no file');
+    const json = await resp.json();
+    state.data = json;
+    const ts = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+    document.getElementById('lastUpdated').textContent = 'Last updated: ' + ts;
+    console.log('[CompetIntel] Loaded real data from output.json');
+  } catch {
+    state.data = MOCK;
+    document.getElementById('lastUpdated').textContent = 'Last updated: Mock data (demo)';
+    console.log('[CompetIntel] Using mock/demo data');
+  }
+  render();
+}
+
+/* ─── Init ──────────────────────────────────────────────── */
+loadData();
+</script>
+</body>
+</html>
