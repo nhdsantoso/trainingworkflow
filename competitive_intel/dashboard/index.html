@@ -292,6 +292,44 @@ svg { display: block; }
 .stat-card.tsel .value { color: var(--tsel); }
 .stat-card.comp .value { color: var(--comp); }
 
+/* ── Source legend ──────────────────────────────────────── */
+.source-legend {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 8px 0 16px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.source-legend span { display: flex; align-items: center; gap: 3px; }
+
+/* ── Source filter chips ────────────────────────────────── */
+.source-filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.source-chip {
+  padding: 3px 10px;
+  border-radius: 14px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all .15s;
+}
+.source-chip:hover { color: var(--text); border-color: var(--text-muted); }
+.source-chip.active {
+  background: var(--comp-mid);
+  border-color: var(--comp);
+  color: var(--comp);
+}
+
 /* ── Section heading ────────────────────────────────────── */
 .section-head {
   display: flex;
@@ -388,10 +426,40 @@ td.price { font-weight: 600; }
   margin: 1px;
 }
 .region-tag.hit { background: #FEF9C3; border-color: #FDE047; color: #78350F; }
-:root[data-theme="dark"] .region-tag.hit,
-:root:not([data-theme="light"]) .region-tag.hit {
-  /* applied via JS class, ensure readable in dark */
+
+/* ── Source badge ───────────────────────────────────────── */
+.src-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  white-space: nowrap;
 }
+.src-badge.instagram { background: #FDF2F8; border-color: #FBCFE8; color: #9D174D; }
+.src-badge.google_play { background: #F0FDF4; border-color: #BBF7D0; color: #166534; }
+.src-badge.app_store { background: #EFF6FF; border-color: #BFDBFE; color: #1E40AF; }
+.src-badge.website { background: var(--surface2); border-color: var(--border); color: var(--text-muted); }
+:root[data-theme="dark"] .src-badge.instagram,
+:root:not([data-theme="light"]) .src-badge.instagram {
+  background: #3B0A2A; border-color: #9D174D; color: #FBCFE8;
+}
+:root[data-theme="dark"] .src-badge.google_play,
+:root:not([data-theme="light"]) .src-badge.google_play {
+  background: #052E16; border-color: #166534; color: #BBF7D0;
+}
+:root[data-theme="dark"] .src-badge.app_store,
+:root:not([data-theme="light"]) .src-badge.app_store {
+  background: #0D1E3D; border-color: #1E40AF; color: #BFDBFE;
+}
+
+/* ── Stars ──────────────────────────────────────────────── */
+.stars { color: #F59E0B; font-size: 10px; letter-spacing: 1px; }
 
 /* ── Price chart ────────────────────────────────────────── */
 .chart-panel {
@@ -593,8 +661,17 @@ td.price { font-weight: 600; }
   margin-top: auto;
   padding-top: 6px;
   border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 4px;
 }
 .pc-regions { display: flex; flex-wrap: wrap; gap: 3px; }
+.pc-likes {
+  font-size: 10px;
+  color: var(--text-faint);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
 
 /* ── Program / Service cards ─────────────────────────────── */
 .info-list {
@@ -648,6 +725,7 @@ td.price { font-weight: 600; }
   align-items: center;
   gap: 6px;
   margin-top: 5px;
+  flex-wrap: wrap;
 }
 
 /* ── Empty state ─────────────────────────────────────────── */
@@ -977,6 +1055,7 @@ let state = {
   brandType: 'mobile',
   region: 'all',
   category: 'product',
+  sourceFilter: 'all',  // 'all' | 'website' | 'instagram' | 'google_play' | 'app_store'
   data: null,
 };
 
@@ -993,9 +1072,15 @@ function matchesRegion(item) {
   return (item.regions || []).some(r => groupWords.includes(r));
 }
 
+function matchesSource(item) {
+  if (state.sourceFilter === 'all') return true;
+  const src = item.source || 'website';
+  return src === state.sourceFilter;
+}
+
 function filterItems(items) {
   return items.filter(item =>
-    item.category === state.category && matchesRegion(item)
+    item.category === state.category && matchesRegion(item) && matchesSource(item)
   );
 }
 
@@ -1022,6 +1107,43 @@ function regionTags(regions) {
   }).join('');
 }
 
+function sourceBadge(item) {
+  const src = item.source || 'website';
+  if (src === 'instagram') {
+    const handle = item.handle ? ` ${item.handle}` : '';
+    return `<span class="src-badge instagram">📸 Instagram${handle}</span>`;
+  }
+  if (src === 'google_play') {
+    const stars = item.rating ? renderStars(item.rating) : '';
+    return `<span class="src-badge google_play">⭐ Play Store${stars ? ' ' + stars : ''}</span>`;
+  }
+  if (src === 'app_store') {
+    const stars = item.rating ? renderStars(item.rating) : '';
+    return `<span class="src-badge app_store">🍎 App Store${stars ? ' ' + stars : ''}</span>`;
+  }
+  return `<span class="src-badge website">🌐 Website</span>`;
+}
+
+function renderStars(rating) {
+  const n = Math.round(rating);
+  return '★'.repeat(n) + '☆'.repeat(5 - n);
+}
+
+/* ─── Source filter row ─────────────────────────────────── */
+function renderSourceFilter() {
+  const options = [
+    { key: 'all', label: 'Semua' },
+    { key: 'website', label: '🌐 Website' },
+    { key: 'instagram', label: '📸 Instagram' },
+    { key: 'google_play', label: '⭐ Play Store' },
+    { key: 'app_store', label: '🍎 App Store' },
+  ];
+  return `<div class="source-filter">${options.map(o =>
+    `<button class="source-chip${state.sourceFilter === o.key ? ' active' : ''}"
+      onclick="setSourceFilter('${o.key}')">${o.label}</button>`
+  ).join('')}</div>`;
+}
+
 /* ─── Render: Summary strip ─────────────────────────────── */
 function renderSummary() {
   const bd = state.data ? (state.data[state.brandType] || {}) : {};
@@ -1038,6 +1160,15 @@ function renderSummary() {
     ? Math.round(compProducts.reduce((s,i) => s + (i.price||0), 0) / compProducts.length) : 0;
   const avgTselPrice = tselProducts.length
     ? Math.round(tselProducts.reduce((s,i) => s + (i.price||0), 0) / tselProducts.length) : 0;
+
+  // Count sources in current view
+  const allItems = [...allComp, ...allTsel];
+  const srcCounts = {};
+  allItems.forEach(i => { const s = i.source || 'website'; srcCounts[s] = (srcCounts[s]||0)+1; });
+  const srcParts = Object.entries(srcCounts).map(([s,c]) => {
+    const icon = s==='instagram'?'📸':s==='google_play'?'⭐':s==='app_store'?'🍎':'🌐';
+    return `${icon} ${c}`;
+  }).join(' · ');
 
   document.getElementById('summaryStrip').innerHTML = `
     <div class="stat-card comp">
@@ -1063,7 +1194,7 @@ function renderSummary() {
     <div class="stat-card">
       <div class="label">Region Filter</div>
       <div class="value" style="font-size:16px;font-weight:700;text-transform:capitalize;color:var(--text)">${state.region === 'all' ? 'Semua' : state.region.charAt(0).toUpperCase()+state.region.slice(1)}</div>
-      <div class="sub">${state.brandType === 'mobile' ? 'Mobile network' : 'Fixed broadband'}</div>
+      <div class="sub">${srcParts || (state.brandType === 'mobile' ? 'Mobile network' : 'Fixed broadband')}</div>
     </div>
   `;
 }
@@ -1076,7 +1207,7 @@ function renderProductTable(items, role) {
     <tr>
       <td><span class="brand-chip ${cls}">${item.brand}</span></td>
       <td>${item.name || item.title || '—'}</td>
-      <td class="price ${cls === 'tsel' ? '' : ''}" style="color:var(--${cls})">${fmtPrice(item.price)}</td>
+      <td class="price" style="color:var(--${cls})">${fmtPrice(item.price)}</td>
       <td class="muted">${item.quota || '—'}</td>
       <td class="muted">${item.validity || '—'}</td>
       <td>${regionTags(item.regions)}</td>
@@ -1112,7 +1243,6 @@ function renderPriceChart(compItems, tselItems) {
 
   const compRows = compItems.filter(i => i.price).slice(0,6).map(item => {
     const pct = Math.max(4, Math.round((item.price / maxPrice) * 100));
-    const label = (item.name || '').length > 24 ? (item.name||'').slice(0,24)+'…' : (item.name||'—');
     const inside = pct > 30;
     return `
       <div class="bar-row">
@@ -1222,18 +1352,33 @@ function renderSentiment(compItems, tselItems) {
 function renderPromoCards(items, role) {
   const cls = role === 'telkomsel' ? 'tsel' : 'comp';
   if (!items.length) return `<div class="empty">Tidak ada promo untuk filter ini.</div>`;
-  return `<div class="promo-grid">${items.map(item => `
+  return `<div class="promo-grid">${items.map(item => {
+    const src = item.source || 'website';
+    const isIG = src === 'instagram';
+    const likesHtml = isIG && item.likes != null
+      ? `<span class="pc-likes">❤ ${item.likes.toLocaleString('id-ID')} likes</span>`
+      : '';
+    const urlHtml = item.url
+      ? `<a href="${item.url}" target="_blank" rel="noopener" style="font-size:10px;color:var(--comp);">Lihat →</a>`
+      : '';
+    return `
     <div class="promo-card">
       <div class="pc-header">
         <div class="pc-title">${item.title || '—'}</div>
         ${item.price ? `<div class="pc-price ${cls}">${fmtPrice(item.price)}</div>` : ''}
       </div>
+      <div style="margin-bottom:2px">${sourceBadge(item)}</div>
       <div class="pc-snippet">${item.snippet || '—'}</div>
       <div class="pc-footer">
         <div class="pc-regions">${regionTags(item.regions)}</div>
-        <span class="brand-chip ${cls}">${item.brand}</span>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          ${likesHtml}
+          ${urlHtml}
+          <span class="brand-chip ${cls}">${item.brand}</span>
+        </div>
       </div>
-    </div>`).join('')}</div>`;
+    </div>`;
+  }).join('')}</div>`;
 }
 
 /* ─── Render: Info list (program / service) ──────────────── */
@@ -1264,6 +1409,16 @@ function renderComplaintList(items, role) {
     const sColor = s === 'positive' ? 'var(--pos)' : s === 'negative' ? 'var(--neg)' : 'var(--neu)';
     const sBg = s === 'positive' ? 'var(--pos-light)' : s === 'negative' ? 'var(--neg-light)' : 'var(--neu-light)';
     const sLabel = s === 'positive' ? 'Positif' : s === 'negative' ? 'Negatif' : 'Netral';
+    const src = item.source || 'website';
+    const ratingHtml = (item.rating != null && (src === 'google_play' || src === 'app_store'))
+      ? `<span class="stars" title="${item.rating}/5">${renderStars(item.rating)}</span>`
+      : '';
+    const likesHtml = src === 'instagram' && item.likes != null
+      ? `<span style="font-size:10px;color:var(--text-faint);">❤ ${item.likes.toLocaleString('id-ID')}</span>`
+      : '';
+    const urlHtml = item.url
+      ? `<a href="${item.url}" target="_blank" rel="noopener" style="font-size:10px;color:var(--comp);">Lihat →</a>`
+      : '';
     return `
     <div class="info-item">
       <div class="ii-icon ${cls}" style="background:${sBg};color:${sColor};font-size:11px;font-weight:700;letter-spacing:.02em">${sLabel.slice(0,3)}</div>
@@ -1273,6 +1428,10 @@ function renderComplaintList(items, role) {
         <div class="ii-meta">
           <span class="brand-chip ${cls}">${item.brand}</span>
           <span style="font-size:10px;font-weight:600;color:${sColor};background:${sBg};padding:2px 7px;border-radius:10px">${sLabel}</span>
+          ${sourceBadge(item)}
+          ${ratingHtml}
+          ${likesHtml}
+          ${urlHtml}
           ${regionTags(item.regions)}
         </div>
       </div>
@@ -1286,6 +1445,7 @@ function render() {
   const { comp, tsel } = getAllItems();
 
   let html = '';
+  const showSourceFilter = (state.category === 'complaint' || state.category === 'promo');
 
   if (state.category === 'product') {
     html += `
@@ -1309,6 +1469,7 @@ function render() {
       ${renderProductTable(tsel, 'telkomsel')}`;
 
   } else if (state.category === 'promo') {
+    html += renderSourceFilter();
     html += `
       <div class="section-head">
         <span class="section-title">Promo Kompetitor</span>
@@ -1350,6 +1511,7 @@ function render() {
       ${renderInfoList(tsel, 'telkomsel')}`;
 
   } else if (state.category === 'complaint') {
+    html += renderSourceFilter();
     html += renderSentiment(comp, tsel);
     html += `
       <div class="section-head">
@@ -1385,9 +1547,15 @@ function setRegion(r) {
 
 function setCategory(c) {
   state.category = c;
+  state.sourceFilter = 'all';
   document.querySelectorAll('.cat-tab').forEach(t => {
     t.classList.toggle('active', t.dataset.cat === c);
   });
+  render();
+}
+
+function setSourceFilter(src) {
+  state.sourceFilter = src;
   render();
 }
 
@@ -1412,8 +1580,23 @@ async function loadData() {
     if (!resp.ok) throw new Error('no file');
     const json = await resp.json();
     state.data = json;
-    const ts = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
-    document.getElementById('lastUpdated').textContent = 'Last updated: ' + ts;
+    // Read last_updated from _meta if available
+    let ts;
+    if (json._meta && json._meta.last_updated) {
+      try {
+        ts = new Date(json._meta.last_updated).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+      } catch {
+        ts = json._meta.last_updated;
+      }
+    } else {
+      ts = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+    }
+    // Show source list from _meta if available
+    const sources = (json._meta && json._meta.sources) ? json._meta.sources : [];
+    const srcStr = sources.length
+      ? ' · ' + sources.map(s => s === 'instagram' ? '📸' : s === 'google_play' ? '⭐' : s === 'app_store' ? '🍎' : '🌐').join(' ')
+      : '';
+    document.getElementById('lastUpdated').textContent = 'Diperbarui: ' + ts + srcStr;
     console.log('[CompetIntel] Loaded real data from output.json');
   } catch {
     state.data = MOCK;
