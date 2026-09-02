@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 33% 98%;
+    --foreground: 224 39% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 39% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 39% 12%;
+    --primary: 244 74% 58%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 25% 95%;
+    --secondary-foreground: 224 30% 20%;
+    --muted: 220 20% 95%;
+    --muted-foreground: 220 12% 46%;
+    --accent: 244 80% 96%;
+    --accent-foreground: 244 74% 40%;
+    --destructive: 0 74% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 158 72% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 35 92% 50%;
+    --warning-foreground: 30 60% 12%;
+    --border: 220 18% 90%;
+    --input: 220 18% 90%;
+    --ring: 244 74% 58%;
+    --radius: 0.9rem;
+
+    /* --- Token visualisasi data (palet tervalidasi, aman colorblind) --- */
+    --viz-income: #2a78d6;   /* biru  : uang masuk */
+    --viz-expense: #e34948;  /* merah : uang keluar */
+    --viz-neutral: #94a3b8;
+    --viz-grid: #e7e9f0;
+    --viz-axis: #6b7280;
+    --viz-surface: #ffffff;
+    --viz-bar: #2a78d6;
+    --viz-bar-soft: #9ec5f4;
+  }
+
+  .dark {
+    --background: 226 34% 7%;
+    --foreground: 220 22% 96%;
+    --card: 226 30% 11%;
+    --card-foreground: 220 22% 96%;
+    --popover: 226 30% 11%;
+    --popover-foreground: 220 22% 96%;
+    --primary: 244 80% 68%;
+    --primary-foreground: 226 40% 10%;
+    --secondary: 226 22% 17%;
+    --secondary-foreground: 220 22% 92%;
+    --muted: 226 22% 16%;
+    --muted-foreground: 220 12% 65%;
+    --accent: 244 40% 22%;
+    --accent-foreground: 244 90% 88%;
+    --destructive: 0 70% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 158 62% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 35 92% 58%;
+    --warning-foreground: 30 60% 10%;
+    --border: 226 20% 20%;
+    --input: 226 20% 22%;
+    --ring: 244 80% 68%;
+
+    --viz-income: #3987e5;
+    --viz-expense: #e66767;
+    --viz-neutral: #7b8496;
+    --viz-grid: #2a2f3d;
+    --viz-axis: #98a2b3;
+    --viz-surface: #171b26;
+    --viz-bar: #3987e5;
+    --viz-bar-soft: #1c5cab;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    overscroll-behavior-y: none;
+  }
+
+  /* Angka rupiah lebih rapi dengan tabular numerals */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer utilities {
+  .safe-bottom {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .glass {
+    backdrop-filter: blur(16px) saturate(160%);
+  }
+}
